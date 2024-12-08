@@ -15,19 +15,24 @@ def validate_email_address(email):
 
 def generate_chatgpt_response(prompt):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Replace with "gpt-4" if you have access
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
+        # Construct the full prompt to include the system message
+        full_prompt = (
+            "You are a helpful assistant.\n"
+            f"User: {prompt}\n"
+            "Assistant:"
+        )
+        
+        response = openai.Completion.create(
+            model="text-davinci-003",  # Ensure the model is compatible with your setup
+            prompt=full_prompt,
             max_tokens=1500,
             temperature=0.7
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response['choices'][0]['text'].strip()
     except Exception as e:
         st.error(f"Error generating response: {e}")
         return None
+
 
 # Set page config
 st.set_page_config(page_title="Predication Generator", layout="centered", menu_items={"About": "bexaga Lab à Genève, contact us at gaillardbx@gmail.com"})
