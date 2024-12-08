@@ -12,9 +12,6 @@ def validate_email_address(email):
     except EmailNotValidError:
         return None
 
-# Initialize the OpenAI client
-client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-
 def generate_chatgpt_responses(prompt):
     try:
         response = openai.ChatCompletion.create(
@@ -102,7 +99,7 @@ if st.button("Generate Predication"):
         f"Rédige une homélie de 8 minutes pour {profile} en {language} qui communique sur {st.session_state.get('TOPIC', '')} "
         f"en utilisant ces sources: {', '.join(source_variables.values())}."
     )
-    predication = generate_chatgpt_response(predication_prompt)
+    predication = generate_chatgpt_responses(predication_prompt)
     st.markdown(predication, unsafe_allow_html=True)
 
 # Step 4: Share
