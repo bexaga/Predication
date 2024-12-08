@@ -5,6 +5,12 @@ from email_validator import validate_email, EmailNotValidError
 
 #pip install --upgrade openai
 
+import openai
+import streamlit as st
+
+st.sidebar.markdown("### Debug Info")
+st.sidebar.write(f"Installed OpenAI version: {openai.__version__}")
+
 
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
