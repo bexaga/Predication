@@ -1,6 +1,5 @@
 import streamlit as st
 import openai
-import re
 from email_validator import validate_email, EmailNotValidError
 
 # Set up OpenAI API key
@@ -10,37 +9,35 @@ def validate_email_address(email):
     try:
         valid = validate_email(email)
         return valid.email
-    except EmailNotValidError as e:
+    except EmailNotValidError:
         return None
 
-
-def generate_chatgpt_response(prompt):
+def generate_chatgpt_responses(prompt):
     try:
-        response = client.completions.create(
-            model="text-davinci-003",  # Replace with "curie" if needed
-            prompt=f"You are a helpful assistant.\nUser: {prompt}\nAssistant:",
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
             max_tokens=1500,
-            temperature=0.7
+            temperature=0.7,
+            n=3  # Generate 3 response options
         )
-        print(response.choices[0].text)
-        print(dict(response).get('usage'))
-        print(response.model_dump_json(indent=2))
-        return response.choices[0].text.strip()
+        return [choice.text.strip() for choice in response.choices]
     except Exception as e:
-        print(f"Error generating response: {e}")
+        st.error(f"Error generating response: {e}")
         return None
-
 
 # Set page config
-st.set_page_config(page_title="Predication Generator", layout="centered", menu_items={"About": "bexaga Lab à Genève, contact us at gaillardbx@gmail.com"})
+st.set_page_config(
+    page_title="Predication Generator",
+    layout="centered",
+    menu_items={"About": "bexaga Lab à Genève, contact us at gaillardbx@gmail.com"}
+)
 
 # Hamburger menu
 with st.sidebar:
     st.header("Menu")
     language = st.selectbox("Select Language", ["French", "English", "Spanish"], key="LANGUAGE")
     st.markdown("**About Us**: bexaga Lab à Genève\n**Contact Us**: gaillardbx@gmail.com")
-    st.sidebar.markdown("### Debug Info")
-    st.sidebar.write(f"Installed OpenAI version: {openai.__version__}")
 
 # Step 1: Identify Key Message
 st.header("Step 1: Identify Key Message")
@@ -59,31 +56,36 @@ elif method == "Custom Input":
     topic_prompt = st.text_area("Enter your custom topic prompt:")
 
 if st.button("Generate Key Messages"):
-    topic = generate_chatgpt_response(topic_prompt)
-    st.session_state["TOPIC"] = topic
-    st.text_area("Key Messages", topic, height=200, disabled=True)
+    responses = generate_chatgpt_responses(topic_prompt)
+    if responses:
+        st.session_state["RESPONSES"] = responses
+        st.write("### Choose a Key Message:")
+        for i, response in enumerate(responses):
+            if st.button(response, key=f"option_{i}"):
+                st.session_state["SELECTED_RESPONSE"] = response
+                st.success(f"Selected: {response}")
 
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
-source_variables = {}
+if "SELECTED_RESPONSE" in st.session_state:
+    inspiration_sources = {
+        "Joke": "Tu es un pasteur évangélique médiatique, propose 3 mots d'esprit ou blagues sur le thème {theme} en {language}.",
+        "Semantic Explanation": "Une explication sémantique pour un mot complexe utilisé dans les textes du jour en {language}.",
+        "Dogma Reference": "Une ouverture sur une référence des textes officiels de la doctrine, catéchisme, pères de l'église en {language}.",
+        "Current Event": "Un évènement actuel pertinent pour les chrétiens auquel on pourrait faire référence en lien avec {topic} en {language}.",
+        "Metaphor": "Une métaphore créative pour expliquer {topic} en {language}.",
+        "Everyday Life Situation": "Une situation de la vie quotidienne où ce message clé sera particulièrement pertinent en {language}."
+    }
 
-inspiration_sources = {
-    "Joke": "Tu es un pasteur évangélique médiatique, propose 3 mots d'esprit ou blagues sur le thème {theme} en {language}.",
-    "Semantic Explanation": "Une explication sémantique pour un mot complexe utilisé dans les textes du jour en {language}.",
-    "Dogma Reference": "Une ouverture sur une référence des textes officiels de la doctrine, catéchisme, pères de l'église en {language}.",
-    "Current Event": "Un évènement actuel pertinent pour les chrétiens auquel on pourrait faire référence en lien avec {topic} en {language}.",
-    "Metaphor": "Une métaphore créative pour expliquer {topic} en {language}.",
-    "Everyday Life Situation": "Une situation de la vie quotidienne où ce message clé sera particulièrement pertinent en {language}."
-}
+    source_responses = {}
+    for source, prompt_template in inspiration_sources.items():
+        prompt = prompt_template.format(theme=theme, topic=st.session_state["SELECTED_RESPONSE"], language=language)
+        if st.button(f"Generate {source}"):
+            response = generate_chatgpt_responses(prompt)
+            if response:
+                source_responses[source] = response[0]
+                st.text_area(f"{source} Output", response[0], height=150, disabled=True)
 
-for source, prompt_template in inspiration_sources.items():
-    st.subheader(source)
-    prompt = prompt_template.format(theme=theme, topic=st.session_state.get("TOPIC", ""), language=language)
-    if st.button(f"Generate {source}"):
-        response = generate_chatgpt_response(prompt)
-        source_variables[source] = response
-        st.session_state[f"SOURCE_{source.upper().replace(' ', '_')}"] = response
-        st.text_area(f"{source} Output", response, height=150, disabled=True)
 
 # Step 3: Compose the Predication
 st.header("Step 3: Compose the Predication")
