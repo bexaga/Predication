@@ -3,12 +3,6 @@ import openai
 import re
 from email_validator import validate_email, EmailNotValidError
 
-#pip install --upgrade openai
-
-st.sidebar.markdown("### Debug Info")
-st.sidebar.write(f"Installed OpenAI version: {openai.__version__}")
-
-
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -43,6 +37,9 @@ with st.sidebar:
     st.header("Menu")
     language = st.selectbox("Select Language", ["French", "English", "Spanish"], key="LANGUAGE")
     st.markdown("**About Us**: bexaga Lab à Genève\n**Contact Us**: gaillardbx@gmail.com")
+
+st.sidebar.markdown("### Debug Info")
+st.sidebar.write(f"Installed OpenAI version: {openai.__version__}")
 
 # Step 1: Identify Key Message
 st.header("Step 1: Identify Key Message")
