@@ -18,15 +18,20 @@ def validate_email_address(email):
 
 def generate_chatgpt_response(prompt):
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=prompt,
-            max_tokens=1500
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",  # Use the latest chat model
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=1500,
+            temperature=0.7
         )
-        return response.choices[0].text.strip()
+        return response['choices'][0]['message']['content'].strip()
     except Exception as e:
         st.error(f"Error generating response: {e}")
         return None
+
 
 # Set page config
 st.set_page_config(page_title="Predication Generator", layout="centered", menu_items={"About": "bexaga Lab à Genève, contact us at gaillardbx@gmail.com"})
