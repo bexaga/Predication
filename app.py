@@ -12,19 +12,19 @@ def validate_email_address(email):
     except EmailNotValidError:
         return None
 
+# Initialize the OpenAI client
+client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
 def generate_chatgpt_responses(prompt):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Ensure this model is available in your OpenAI account
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
+        response = client.completions.create(
+            model="text-davinci-003",
+            prompt=prompt,
             max_tokens=1500,
             temperature=0.7,
             n=3  # Generate 3 response options
         )
-        return [choice['message']['content'].strip() for choice in response['choices']]
+        return [choice.text.strip() for choice in response.choices]
     except Exception as e:
         st.error(f"Error generating response: {e}")
         return None
