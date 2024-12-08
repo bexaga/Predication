@@ -3,6 +3,9 @@ import openai
 import re
 from email_validator import validate_email, EmailNotValidError
 
+pip install --upgrade openai
+
+
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
