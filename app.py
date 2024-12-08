@@ -13,24 +13,21 @@ def validate_email_address(email):
     except EmailNotValidError as e:
         return None
 
+
 def generate_chatgpt_response(prompt):
     try:
-        # Construct the full prompt to include the system message
-        full_prompt = (
-            "You are a helpful assistant.\n"
-            f"User: {prompt}\n"
-            "Assistant:"
-        )
-        
-        response = openai.Completion.create(
-            model="text-davinci-003",  # Ensure the model is compatible with your setup
-            prompt=full_prompt,
+        response = client.completions.create(
+            model="text-davinci-003",  # Replace with "curie" if needed
+            prompt=f"You are a helpful assistant.\nUser: {prompt}\nAssistant:",
             max_tokens=1500,
             temperature=0.7
         )
-        return response['choices'][0]['text'].strip()
+        print(response.choices[0].text)
+        print(dict(response).get('usage'))
+        print(response.model_dump_json(indent=2))
+        return response.choices[0].text.strip()
     except Exception as e:
-        st.error(f"Error generating response: {e}")
+        print(f"Error generating response: {e}")
         return None
 
 
