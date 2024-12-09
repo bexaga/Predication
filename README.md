@@ -1,5 +1,7 @@
 # Predication Generator
 
+This assists the preacher with identifying an idea and finding inspiration. We do propose an automated predication but the main value is in browsing options for each source and composing the perfect predication for a given occasion.
+
 This repository contains a Streamlit application designed to help users create personalized predications (homilies) using OpenAI's GPT API. The app guides users through a structured multi-step process to generate, refine, and share predications based on their preferences.
 
 ## Features
