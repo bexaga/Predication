@@ -1,28 +1,25 @@
 import streamlit as st
 import openai
-from email_validator import validate_email, EmailNotValidError
 
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = openai.OpenAI()
 
-def validate_email_address(email):
-    try:
-        valid = validate_email(email)
-        return valid.email
-    except EmailNotValidError:
-        return None
 
 def generate_chatgpt_responses(prompt):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+        response = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
+                {
+                    "role" : "system",
+                    "content" : "You are an assistant to help preachers find inspiration."
+                },
+                {
+                    "role": "user",
+                    "content": "Say this is a test",
+                }
             ],
-            max_tokens=1500,
-            temperature=0.7,
-            n=3  # Generate 3 response options
+            model="gpt-4o-mini",
         )
         return [choice["message"]["content"].strip() for choice in response["choices"]]
     except Exception as e:
@@ -96,9 +93,9 @@ profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "P
 
 if st.button("Generate Predication"):
     predication_prompt = (
-        f"Rédige une homélie de 8 minutes pour {profile} en {language} qui communique sur {st.session_state.get('TOPIC', '')} "
-        f"en utilisant ces sources: {', '.join(source_variables.values())}."
+        f"Rédige une homélie de 8 minutes pour {profile} en {language} qui communique sur {st.session_state.get('TOPIC', '')} " ## TODO: add sources
     )
+    # f"en utilisant ces sources: {', '.join(source_variables.values())}."
     predication = generate_chatgpt_responses(predication_prompt)
     st.markdown(predication, unsafe_allow_html=True)
 
@@ -109,7 +106,5 @@ city = st.text_input("City:")
 country = st.text_input("Country:")
 
 if st.button("Send Email"):
-    if validate_email_address(email):
-        st.success("Predication emailed successfully!")
-    else:
-        st.error("Invalid email address. Please enter a valid email.")
+    pass
+    # TODO Send email.
