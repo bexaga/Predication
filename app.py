@@ -8,20 +8,21 @@ client = openai.OpenAI()
 
 def generate_chatgpt_responses(prompt):
     try:
-        response = client.chat.completions.create(
-            messages=[
-                {
-                    "role" : "system",
-                    "content" : "You are an assistant to help preachers find inspiration."
-                },
-                {
-                    "role": "user",
-                    "content": "Say this is a test",
-                }
-            ],
-            model="gpt-4o-mini",
-        )
-        return [choice["message"]["content"].strip() for choice in response["choices"]]
+        # response = client.chat.completions.create(
+        #     messages=[
+        #         {
+        #             "role" : "system",
+        #             "content" : "You are an assistant to help preachers find inspiration."
+        #         },
+        #         {
+        #             "role": "user",
+        #             "content": "Say this is a test",
+        #         }
+        #     ],
+        #     model="gpt-4o-mini",
+        # )
+        # return [choice["message"]["content"].strip() for choice in response["choices"]]
+        return ["message1", "message2"]
     except Exception as e:
         st.error(f"Error generating response: {e}")
         return None
