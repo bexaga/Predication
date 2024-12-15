@@ -16,7 +16,6 @@ def generate_chatgpt_responses(prompt):
     Returns:
         list: A list of response messages from the chatbot.
     """
-    openai.api_key = OPENAI_API_KEY  # Ensure you set your API key
 
     try:
         response = openai.ChatCompletion.create(
