@@ -6,8 +6,6 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 client = openai.OpenAI()
 
 
-import openai
-
 def generate_chatgpt_responses(prompt):
     """
     Generates a response from ChatGPT using OpenAI's API.
@@ -18,7 +16,7 @@ def generate_chatgpt_responses(prompt):
     Returns:
         list: A list of response messages from the chatbot.
     """
-    openai.api_key = "your_openai_api_key"  # Ensure you set your API key
+    openai.api_key = OPENAI_API_KEY  # Ensure you set your API key
 
     try:
         response = openai.ChatCompletion.create(
