@@ -7,24 +7,31 @@ client = openai.OpenAI()
 
 
 def generate_chatgpt_responses(prompt):
+    """
+    Generates a response from ChatGPT using OpenAI's API.
+
+    Args:
+        prompt (str): The user's input for the chatbot.
+
+    Returns:
+        list: A list of response messages from the chatbot.
+    """
+    openai.api_key = "your_openai_api_key"  # Ensure you set your API key
+
     try:
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
             messages=[
-                {
-                    "role" : "system",
-                    "content" : "You are an assistant to help preachers find inspiration."
-                },
-                {
-                    "role": "user",
-                    "content": "Say this is a test",
-                }
+                {"role": "system", "content": "You are an assistant to help preachers find inspiration."},
+                {"role": "user", "content": prompt},
             ],
-            model="gpt-3.5",
         )
-        return [choice["message"]["content"].strip() for choice in response["choices"]]
-        
-    except Exception as e:
-        st.error(f"Error generating response: {e}")
+
+        # Extract the content of the first response
+        return [choice["message"]["content"].strip() for choice in response.choices]
+
+    except openai.error.OpenAIError as e:
+        print(f"Error generating response: {e}")
         return None
 
 # Set page config
