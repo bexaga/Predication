@@ -19,7 +19,7 @@ def generate_chatgpt_responses(prompt):
                     "content": "Say this is a test",
                 }
             ],
-            model="gpt-4o-mini",
+            model="gpt-3.5",
         )
         return [choice["message"]["content"].strip() for choice in response["choices"]]
         
