@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # DEBUG: Start of the app
 st.write("DEBUG: Application start")
-st.write("DEBUG: Using openai version:", openai.__version__)
+#st.write("DEBUG: Using openai version:", openai.__version__)
 
 # Set up OpenAI API key
 try:
