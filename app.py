@@ -4,6 +4,16 @@ import openai
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
+from openai import OpenAI
+client = OpenAI()
+
+client.completions.create(
+  model="gpt-3.5-turbo-instruct",
+  prompt="Say this is a test",
+  max_tokens=7,
+  temperature=0
+)
+
 def generate_chatgpt_responses(prompt):
     """
     Generates a response from ChatGPT using OpenAI's API.
@@ -18,6 +28,7 @@ def generate_chatgpt_responses(prompt):
         )
         # Extract the content of the first response
         return [response["choices"][0]["message"]["content"].strip()]
+        print(response)
     except Exception as e:
         print(f"Error generating response: {e}")
         return None
