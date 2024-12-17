@@ -66,7 +66,7 @@ if st.button("Generate Key Messages"):
             if st.button(response, key=f"option_{i}"):
                 st.session_state["SELECTED_RESPONSE"] = response
                 st.success(f"Selected: {response}")
-
+print(topic_prompt)
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
 if "SELECTED_RESPONSE" in st.session_state:
