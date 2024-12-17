@@ -1,6 +1,5 @@
 import streamlit as st
 import openai
-!pip install openai==0.28
 from openai import OpenAI
 
 # DEBUG: Start of the app
