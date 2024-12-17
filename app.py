@@ -13,14 +13,14 @@ def generate_chatgpt_responses(prompt):
     Generates a response from ChatGPT using OpenAI's API.
     """
     try:
-        response = client.chat.completions.create(model="gpt-4",
+completion = client.completions.create(model="davinci-002", prompt="Hello world")
+
+        response = client.completions.create(model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are an assistant to help preachers find inspiration."},
-            {"role": "user", "content": prompt},
+            {prompt= prompt},
         ])
         # Extract the content of the first response
         return [response.choices[0].message.content.strip()]
-        print(response)
     except Exception as e:
         print(f"Error generating response: {e}")
         return None
