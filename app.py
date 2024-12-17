@@ -1,8 +1,10 @@
 import streamlit as st
-import openai
+from openai import OpenAI
+
 
 # Set up OpenAI API key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 
 
@@ -11,15 +13,13 @@ def generate_chatgpt_responses(prompt):
     Generates a response from ChatGPT using OpenAI's API.
     """
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an assistant to help preachers find inspiration."},
-                {"role": "user", "content": prompt},
-            ],
-        )
+        response = client.chat.completions.create(model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are an assistant to help preachers find inspiration."},
+            {"role": "user", "content": prompt},
+        ])
         # Extract the content of the first response
-        return [response["choices"][0]["message"]["content"].strip()]
+        return [response.choices[0].message.content.strip()]
         print(response)
     except Exception as e:
         print(f"Error generating response: {e}")
