@@ -4,15 +4,7 @@ import openai
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-from openai import OpenAI
-client = OpenAI()
 
-client.completions.create(
-  model="gpt-3.5-turbo-instruct",
-  prompt="Say this is a test",
-  max_tokens=7,
-  temperature=0
-)
 
 def generate_chatgpt_responses(prompt):
     """
