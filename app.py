@@ -1,10 +1,11 @@
 import streamlit as st
 import openai
 from openai import OpenAI
-st.write("DEBUG: Using openai version:", openai.__version__)
+
 
 # DEBUG: Start of the app
 st.write("DEBUG: Application start")
+st.write("DEBUG: Using openai version:", openai.__version__)
 
 # Set up OpenAI API key
 try:
