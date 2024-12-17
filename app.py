@@ -13,7 +13,7 @@ def generate_chatgpt_responses(prompt):
     Generates a response from ChatGPT using OpenAI's API.
     """
     try:
-completion = client.completions.create(model="davinci-002", prompt="Hello world")
+        completion = client.completions.create(model="davinci-002", prompt="Hello world")
 
         response = client.completions.create(model="gpt-4",
         messages=[
