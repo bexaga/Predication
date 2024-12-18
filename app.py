@@ -76,6 +76,7 @@ if st.button("Proposer un thème"):
                             index = int(option.split()[1]) - 1
                             st.markdown(f"### THEME {index + 1} de l'homélie")
                             st.write(response_content["options"][index])
+                            st.write(f"Thème: {response_content['options'][index]}")
                     else:
                         st.info("Aucune option sélectionnée.")
                 else:
