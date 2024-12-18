@@ -68,7 +68,7 @@ elif method == "Custom Input":
 if st.button("Generate Key Messages"):
     class KeyMessagesSchema(BaseModel):
         """Using this class for JSON structured output as {"key_messages": [msg1, msg2...]}"""
-        key_messages = List[str]
+        key_messages = list[str]
 
     responses = generate_chatgpt_responses(topic_prompt, KeyMessagesSchema)["key_messages"]
 
