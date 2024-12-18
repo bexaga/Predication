@@ -2,8 +2,6 @@ import streamlit as st
 import openai
 import json
 
-class Theme (BaseModel):
-  name: str
     
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
