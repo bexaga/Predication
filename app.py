@@ -1,18 +1,17 @@
 import streamlit as st
 import openai
 import json
+import os
 
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
-    import os
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
+    if not os.getenv("OPENAI_API_KEY"):
         return "Error: OPENAI_API_KEY is not set in the environment variables."
 
-    openai.api_key = api_key
+    client = openai.OpenAI()
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -23,7 +22,7 @@ def get_openai_completion(user_prompt, system_prompt):
 
         return response
 
-    except openai.error.OpenAIError as e:
+    except Exception as e:
         return f"Error: {e}"
 
 # Initialize session state
