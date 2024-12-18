@@ -7,7 +7,12 @@ from typing import List
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 client = openai.OpenAI()
 
-st.session_state["SELECTED_RESPONSE"] = None
+# Initialize session state variables
+if "RESPONSES" not in st.session_state:
+    st.session_state["RESPONSES"] = []
+
+if "SELECTED_RESPONSE" not in st.session_state:
+    st.session_state["SELECTED_RESPONSE"] = None
 
 def generate_chatgpt_responses(prompt=None, response_format=None):
     """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format class."""
@@ -82,13 +87,16 @@ if st.button("Generate Key Messages"):
     # Check if GPT returned valid responses
     if responses:
         st.session_state["RESPONSES"] = responses  # Persist responses in session_state
-        st.write("### Choose a Key Message:")
-        for i, response in enumerate(responses):
-            if st.button(response, key=f"option_{i}"):
-                st.session_state["SELECTED_RESPONSE"] = response  # Persist selection
-                st.success(f"Selected: {response}")
     else:
         st.error("Something went wrong and GPT sent back an empty response.")
+
+# Display generated key messages
+if st.session_state["RESPONSES"]:
+    st.write("### Choose a Key Message:")
+    for i, response in enumerate(st.session_state["RESPONSES"]):
+        if st.button(response, key=f"option_{i}"):
+            st.session_state["SELECTED_RESPONSE"] = response  # Persist selection
+            st.success(f"Selected: {response}")
 
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
@@ -119,7 +127,6 @@ if st.session_state["SELECTED_RESPONSE"]:
                 st.text_area(f"{source} Output", response[0], height=150, disabled=True)
 else:
     st.info("Please select a key message in Step 1 to continue.")
-
 # Step 3: Compose the Predication
 st.header("Step 3: Compose the Predication")
 profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "Pasteur protestant", "Pasteur évangélique", "Père ou mère de famille"])
