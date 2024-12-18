@@ -7,7 +7,7 @@ import traceback as tb
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 client = openai.OpenAI()
 
-def generate_chatgpt_responses(prompt, response_format):
+def generate_chatgpt_responses(prompt=None, response_format=None):
     """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format class."""
     try:
         return ["a", "b", "c"]
