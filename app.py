@@ -10,7 +10,7 @@ def get_openai_completion(user_prompt, system_prompt):
         return "Error: OPENAI_API_KEY is not set in the environment variables."
 
     openai.api_key = api_key
-
+    
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -27,15 +27,12 @@ def get_openai_completion(user_prompt, system_prompt):
         return f"Error: {e}"
 
 # Streamlit UI
-st.title("Homily Assistant")
+st.title("Mon homélie.")
+st.description("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
 
 # Input fields for prompts
-system_prompt = st.text_area(
-    "System Prompt", 
-    "tu assistes les prédicateurs pour annoncer la parole de Dieu. "
-    "Toujours répondre dans ce format JSON strict : {\"options\": [\"Option 1 content\", \"Option 2 content\", \"Option 3 content\"]}."
-)
-user_prompt = st.text_area("User Prompt", "rédige une homélie pour ce jour")
+system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
+user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
 
 if st.button("Generate Homily"):
     # Fetch completion via OpenAI API
@@ -47,19 +44,23 @@ if st.button("Generate Homily"):
         else:
             try:
                 # Print raw response for debugging
-                st.write("### Raw Response:")
-                st.json(response)
+                #st.write("### Raw Response:")
+                #st.json(response)
 
                 # Parse the response to JSON
                 response_content = json.loads(response["choices"][0]["message"]["content"])
 
                 # Ensure the response contains options
                 if "options" in response_content and isinstance(response_content["options"], list):
-                    # Use the actual text of each option as the radio button label
-                    selected_option = st.radio("Select an option to display:", options=response_content["options"])
+                    selected_options = st.multiselect(
+                        "Select options to display:",
+                        options=[f"Option {i+1}" for i in range(len(response_content["options"]))]
+                    )
 
-                    # Display the selected option
-                    st.text_area("Selected Homily Option", value=selected_option, height=200)
+                    # Display each selected option
+                    for selected_option in selected_options:
+                        index = int(selected_option.split()[-1]) - 1
+                        st.text_area(f"Thème {index + 1}", value=response_content["options"][index], height=200)
                 else:
                     st.error("The response does not contain the expected 'options' structure.")
 
