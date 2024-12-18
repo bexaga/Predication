@@ -42,13 +42,18 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
                 },
                 {
                     "role": "user",
-                    "content": "Say this is a test",
+                    "content": prompt,
                 }
             ],
             model="gpt-4o-mini",
+            response_format=response_format
         )
-        st.text_input(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)}")
-        return response.choices[0].message.content.strip()
+        st.text(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)}")
+        
+        if response_format is None:
+            return response.choices[0].message.content.strip()
+        else:
+            return json.loads(response.choices[0].message.to_json())
     except Exception as e:
         st.error(tb.format_exc())
 
@@ -225,7 +230,7 @@ if st.session_state["SELECTED_RESPONSE"]:
             # Generate responses for the source
             response = generate_chatgpt_responses(prompt)
             if response:
-                source_responses[source] = response[0]
+                source_responses[source] = response
                 st.text_area(f"{source} Output", response[0], height=150, disabled=True)
 else:
     st.info("Please select a key message in Step 1 to continue.")
