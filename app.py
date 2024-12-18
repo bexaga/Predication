@@ -31,7 +31,12 @@ st.title("Mon homélie.")
 st.markdown("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
 
 # Input fields for prompts
-system_prompt = st.text_area("System Prompt", "Tu es un assistant qui guide les prédicateurs pour rédiger une homélie.")
+system_prompt = st.text_area(
+    "System Prompt", 
+    "Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu.",
+    "Toujours répondre dans ce format JSON strict : {\"options\": [\"Option 1 content\", \"Option 2 content\", \"Option 3 content\"]}."
+)
+#system_prompt = st.text_area("System Prompt", "Tu es un assistant qui guide les prédicateurs pour rédiger une homélie.")
 user_prompt = st.text_area("User Prompt", "Propose 3 psaumes sur l'Espérance")
 
 if st.button("Generate Homily"):
