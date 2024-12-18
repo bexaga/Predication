@@ -80,7 +80,7 @@ if st.button("Proposer un thème"):
                         st.info("Aucune option sélectionnée.")
                 else:
                     st.error("La réponse ne contient pas la structure attendue 'options'.")
-            st.write(f"Thème: {response_content['options'][index]}")
+                st.write(f"Thème: {response_content['options'][index]}")
  
 
             except json.JSONDecodeError:
