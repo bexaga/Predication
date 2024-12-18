@@ -26,6 +26,13 @@ def get_openai_completion(user_prompt, system_prompt):
     except openai.error.OpenAIError as e:
         return f"Error: {e}"
 
+# Initialize session state
+if "selected_options" not in st.session_state:
+    st.session_state["selected_options"] = []
+
+if "options_text" not in st.session_state:
+    st.session_state["options_text"] = {}
+
 # Streamlit UI
 st.title("Mon homélie")
 st.markdown("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
@@ -64,25 +71,30 @@ if st.button("Proposer un thème"):
                 if "options" in response_content and isinstance(response_content["options"], list):
                     st.markdown("### Sélectionnez un ou plusieurs thèmes ci-dessous :")
 
+                    # Store options in session state
+                    st.session_state["options_text"] = {
+                        f"Thème {i+1}": response_content["options"][i] 
+                        for i in range(len(response_content["options"]))
+                    }
+
                     # Generate the selectable options
                     selected_options = st.multiselect(
                         "Options disponibles :",
-                        options=[f"Thème {i+1}" for i in range(len(response_content["options"]))]
+                        options=list(st.session_state["options_text"].keys()),
+                        default=st.session_state["selected_options"]
                     )
 
-                    # Display selected options as THEME
-                    if selected_options:
-                        for option in selected_options:
-                            index = int(option.split()[1]) - 1
-                            st.markdown(f"### THEME {index + 1} de l'homélie")
-                            st.write(response_content["options"][index])
-                    else:
-                        st.info("Aucune option sélectionnée.")
+                    # Update session state with selected options
+                    st.session_state["selected_options"] = selected_options
                 else:
                     st.error("La réponse ne contient pas la structure attendue 'options'.")
- 
 
             except json.JSONDecodeError:
                 st.error("Échec de l'analyse de la réponse en JSON. Assurez-vous que l'IA renvoie une structure JSON valide.")
 
-st.write(f"Thème: {response_content['options'][index]}")
+# Display the text for the selected options
+if st.session_state["selected_options"]:
+    st.markdown("### Vos sélections :")
+    for option in st.session_state["selected_options"]:
+        st.markdown(f"#### {option}")
+        st.write(f"Thème: {st.session_state['options_text'][option]}")
