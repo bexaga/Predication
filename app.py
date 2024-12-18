@@ -10,6 +10,8 @@ client = openai.OpenAI()
 def generate_chatgpt_responses(prompt, response_format):
     """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format class."""
     try:
+        return ["a", "b", "c"]
+
         system_prompts = {
             "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
             "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
@@ -29,7 +31,6 @@ def generate_chatgpt_responses(prompt, response_format):
             ],
             model="gpt-4o-mini",
         )
-        return ["a", "b", "c"]
         return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(tb.format_exc())
