@@ -79,7 +79,7 @@ if st.button("Proposer un thème"):
 
                     # Store options in session state
                     st.session_state["options_text"] = {
-                        f"Thème {i+1}: {response_content['options'][i]}": response_content["options"][i] 
+                        f"Thème {i+1}": response_content["options"][i] 
                         for i in range(len(response_content["options"]))
                     }
 
@@ -103,4 +103,4 @@ if st.session_state["selected_options"]:
     st.markdown("### Vos sélections :")
     for option in st.session_state["selected_options"]:
         st.markdown(f"#### {option}")
-        st.write(f"Thème: {st.session_state['options_text'][option]}")
+        st.write(f"Thème: {st.session_state['options_text'].get(option, 'Texte non disponible')}")
