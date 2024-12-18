@@ -5,6 +5,12 @@ import json
 import os
 import traceback as tb
 
+### Streamlit config ###
+st.set_page_config(
+    page_title="Predication Generator",
+    layout="centered",
+    menu_items={"About": "bexaga Lab à Genève, contact us at gaillardbx@gmail.com"}
+)
 
 ### GPT Connection ###
 ######################
@@ -154,13 +160,6 @@ if st.session_state["selected_options"]:
             st.write("Texte non disponible")
 
 ### Streamlit app setup
-# Set page config
-st.set_page_config(
-    page_title="Predication Generator",
-    layout="centered",
-    menu_items={"About": "bexaga Lab à Genève, contact us at gaillardbx@gmail.com"}
-)
-
 # Hamburger menu
 with st.sidebar:
     st.header("Menu")
