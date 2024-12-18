@@ -8,28 +8,30 @@ client = openai.OpenAI()
 
 def generate_chatgpt_responses(prompt, response_format):
     """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format class."""
-    system_prompts = {
-        "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
-        "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
-        "Spanish": "Eres un asistente que ayuda a los predicadores a encontrar inspiración. Por favor, responde SIEMPRE en ESPAÑOL."
-    }
-    system_prompt = system_prompts[st.session_state["LANGUAGE"]]
-    response = client.chat.completions.create(
-        messages=[
-            {
-                "role" : "system",
-                "content" : system_prompt
-            },
-            {
-                "role": "user",
-                "content": "Say this is a test",
-            }
-        ],
-        model="gpt-4o-mini",
-    )
+    try:
+        system_prompts = {
+            "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
+            "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
+            "Spanish": "Eres un asistente que ayuda a los predicadores a encontrar inspiración. Por favor, responde SIEMPRE en ESPAÑOL."
+        }
+        system_prompt = system_prompts[st.session_state["LANGUAGE"]]
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role" : "system",
+                    "content" : system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": "Say this is a test",
+                }
+            ],
+            model="gpt-4o-mini",
+        )
 
-    return response.choices[0].message.content.strip()
-    
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        st.error(e)
 
 ### Streamlit app
 # Set page config
