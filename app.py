@@ -14,10 +14,9 @@ st.set_page_config(
 
 ### GPT Connection ###
 ######################
-client = openai.OpenAI()
-
 if not os.getenv("OPENAI_API_KEY"):
     st.error("Error: OPENAI_API_KEY is not set in the environment variables.")
+client = openai.OpenAI()
 
 # Schemas for GPT JSON structure output
 class KeyMessagesSchema(BaseModel):
