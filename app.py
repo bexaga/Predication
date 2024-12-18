@@ -136,7 +136,7 @@ profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "P
 
 if st.button("Generate Predication"):
     predication_prompt = (
-        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} and including the following phrase as inspiration source {}" ## TODO: add inspiration sources
+        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration {st.session_state.get('SOURCE')}" ## TODO: add inspiration sources
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
     predication = generate_chatgpt_responses(predication_prompt)
