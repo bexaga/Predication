@@ -33,8 +33,19 @@ st.markdown("Cet assistant vous guide pour identifier un thème, trouver des ré
 # Input fields for prompts
 system_prompt = st.text_area(
     "System Prompt", 
-    "Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu. Toujours répondre dans ce format JSON strict : {\"options\": [\"Option 1 content\", \"Option 2 content\", \"Option 3 content\"]}."
+    """Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu. 
+    Lorsque l'utilisateur te pose une question, réponds dans un format JSON strict.
+    Assure-toi que la réponse JSON soit formatée exactement ainsi : 
+    {
+        "options": [
+            "Option 1 content",
+            "Option 2 content",
+            "Option 3 content"
+        ]
+    }.
+    Si le contenu demandé dépasse tes capacités, réponds quand même dans ce format avec des suggestions générales."""
 )
+
 user_prompt = st.text_area("User Prompt", "Propose 3 psaumes sur l'Espérance")
 
 if st.button("Proposer un thème"):
