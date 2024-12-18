@@ -1,5 +1,6 @@
 import streamlit as st
 import openai
+import json
 
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
@@ -17,7 +18,7 @@ def get_openai_completion(user_prompt, system_prompt):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            stream=True  # Enable streaming
+            max_tokens=1000  # Limit token usage
         )
 
         return response
@@ -40,11 +41,20 @@ if st.button("Generate Homily"):
         if isinstance(response, str) and response.startswith("Error"):
             st.error(response)
         else:
-            st.write("### Generated Homily:")
-            
-            # Stream the response
-            for chunk in response:
-                if 'choices' in chunk:
-                    message_chunk = chunk['choices'][0]['delta'].get('content', '')
-                    if message_chunk:
-                        st.write(message_chunk, unsafe_allow_html=True)
+            try:
+                # Parse the response to JSON
+                response_content = json.loads(response["choices"][0]["message"]["content"])
+
+                # Ensure the response contains options
+                if "options" in response_content and isinstance(response_content["options"], list):
+                    selected_option = st.radio("Select an option to display:", options=[f"Option {i+1}" for i in range(len(response_content["options"]))])
+
+                    # Display each option based on user selection
+                    for i, option in enumerate(response_content["options"]):
+                        if selected_option == f"Option {i+1}":
+                            st.text_area(f"Homily Option {i+1}", value=option, height=200)
+                else:
+                    st.error("The response does not contain the expected 'options' structure.")
+
+            except json.JSONDecodeError:
+                st.error("Failed to parse the response as JSON. Ensure the AI returns a valid JSON structure.")
