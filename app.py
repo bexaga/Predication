@@ -88,7 +88,7 @@ if st.button("Generate Key Messages"):
 
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
-if "SELECTED_RESPONSE" in st.session_state:
+if st.session_state.get("SELECTED_RESPONSE"):
     inspiration_sources = {
         "Joke": "Tu es un pasteur évangélique médiatique, propose 3 mots d'esprit ou blagues sur le thème {theme} en {language}.",
         "Semantic Explanation": "Une explication sémantique pour un mot complexe utilisé dans les textes du jour en {language}.",
