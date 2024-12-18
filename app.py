@@ -2,14 +2,43 @@ import streamlit as st
 import openai
 import json
 import os
+import traceback as tb
+client = openai.OpenAI()
+
+if not os.getenv("OPENAI_API_KEY"):
+    st.error("Error: OPENAI_API_KEY is not set in the environment variables.")
+
+
+def generate_chatgpt_responses(prompt=None, response_format=None):
+    """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format Pydantic class."""
+    
+    system_prompts = {
+        "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
+        "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
+        "Spanish": "Eres un asistente que ayuda a los predicadores a encontrar inspiración. Por favor, responde SIEMPRE en ESPAÑOL."
+    }
+    try:
+        system_prompt = system_prompts[st.session_state["LANGUAGE"]]
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role" : "system",
+                    "content" : system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": "Say this is a test",
+                }
+            ],
+            model="gpt-4o-mini",
+        )
+        st.text_input(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)"})
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        st.error(tb.format_exc())
 
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
-    if not os.getenv("OPENAI_API_KEY"):
-        return "Error: OPENAI_API_KEY is not set in the environment variables."
-
-    client = openai.OpenAI()
-    
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -68,7 +97,7 @@ if st.button("Proposer un thème"):
                 st.write(response)
 
                 # Parse the response to JSON
-                response_content = json.loads(response["choices"][0]["message"]["content"])
+                response_content = json.loads(response.choices[0].message.content)
 
                 # Ensure the response contains options
                 if "options" in response_content and isinstance(response_content["options"], list):
