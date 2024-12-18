@@ -41,9 +41,9 @@ if st.button("Generate Homily"):
         if isinstance(response, str) and response.startswith("Error"):
             st.error(response)
         else: 
-                # Print raw response for debugging
-                st.write("### Raw Response:")
-                st.json(response)
+            # Print raw response for debugging
+            st.write("### Raw Response:")
+            st.json(response)
 
 
             try:
