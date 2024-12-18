@@ -28,7 +28,7 @@ def get_openai_completion(user_prompt, system_prompt):
 
 # Streamlit UI
 st.title("Mon homélie.")
-st.description("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
+st.markdown("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
 
 # Input fields for prompts
 system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
