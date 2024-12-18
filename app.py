@@ -29,7 +29,7 @@ def generate_chatgpt_responses(prompt, response_format):
             ],
             model="gpt-4o-mini",
         )
-
+        return ["a", "b", "c"]
         return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(tb.format_exc())
