@@ -56,8 +56,7 @@ if st.button("Generate Homily"):
                     # Generate the selectable options
                     selected_options = st.multiselect(
                         "Options disponibles :",
-                        options=[f"Thème {i+1}" for i in range(len(response_content["options"]))],
-                        format_func=lambda x: response_content["options"][int(x.split()[1])-1]
+                        options=[f"Thème {i+1}" for i in range(len(response_content["options"]))]
                     )
 
                     # Display selected options as THEME
@@ -65,7 +64,7 @@ if st.button("Generate Homily"):
                         for option in selected_options:
                             index = int(option.split()[1]) - 1
                             st.markdown(f"### THEME {index + 1} de l'homélie")
-                            st.text_area(f"Contenu du Thème {index + 1}", value=response_content["options"][index], height=200)
+                            st.write(response_content["options"][index])
                     else:
                         st.info("Aucune option sélectionnée.")
                 else:
