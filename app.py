@@ -102,5 +102,9 @@ if st.button("Proposer un thème"):
 if st.session_state["selected_options"]:
     st.markdown("### Vos sélections :")
     for option in st.session_state["selected_options"]:
-        st.markdown(f"#### {option}")
-        st.write(f"Thème: {st.session_state['options_text'].get(option, 'Texte non disponible')}")
+        if option in st.session_state["options_text"]:
+            st.markdown(f"#### {option}")
+            st.write(f"Thème: {st.session_state['options_text'][option]}")
+        else:
+            st.markdown(f"#### {option}")
+            st.write("Texte non disponible")
