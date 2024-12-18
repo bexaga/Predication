@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 from pydantic import BaseModel
+import traceback as tb
 
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -31,7 +32,7 @@ def generate_chatgpt_responses(prompt, response_format):
 
         return response.choices[0].message.content.strip()
     except Exception as e:
-        st.error(e)
+        st.error(tb.format_exc())
 
 ### Streamlit app
 # Set page config
