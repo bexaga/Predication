@@ -1,42 +1,37 @@
 import streamlit as st
 import openai
-from openai import OpenAI
-
-
-# DEBUG: Start of the app
-st.write("DEBUG: Application start")
-#st.write("DEBUG: Using openai version:", openai.__version__)
+from pydantic import BaseModel
 
 # Set up OpenAI API key
-try:
-    st.write("DEBUG: Attempting to retrieve OPENAI_API_KEY")
-    api_key = st.secrets["OPENAI_API_KEY"]
-    client = OpenAI(api_key=api_key)
-    st.write("DEBUG: OPENAI_API_KEY successfully retrieved and client initialized")
-except Exception as e:
-    st.error(f"DEBUG: Failed to set API key or initialize OpenAI client: {e}")
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = openai.OpenAI()
 
-def generate_chatgpt_responses(prompt):
-    """
-    Generates a response from ChatGPT (GPT-4) using OpenAI's API.
-    """
-    st.write("DEBUG: generate_chatgpt_responses called with prompt:", prompt)
-    if not prompt:
-        st.error("DEBUG: Empty prompt provided to generate_chatgpt_responses.")
-        return None
-    try:
-        st.write("DEBUG: Attempting to call openai.ChatCompletion.create")
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        st.write("DEBUG: Received response from openai.ChatCompletion.create")
-        # Extract the content of the first response
-        return [response.choices[0].message.content.strip()]
-    except Exception as e:
-        st.error(f"DEBUG: Error generating response: {e}")
-        return None
+def generate_chatgpt_responses(prompt, response_format):
+    """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format class."""
+    system_prompts = {
+        "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
+        "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
+        "Spanish": "Eres un asistente que ayuda a los predicadores a encontrar inspiración. Por favor, responde SIEMPRE en ESPAÑOL."
+    }
+    system_prompt = system_prompts[st.session_state["LANGUAGE"]]
+    response = client.chat.completions.create(
+        messages=[
+            {
+                "role" : "system",
+                "content" : system_prompt
+            },
+            {
+                "role": "user",
+                "content": "Say this is a test",
+            }
+        ],
+        model="gpt-4o-mini",
+    )
 
+    return response.choices[0].message.content.strip()
+    
+
+### Streamlit app
 # Set page config
 try:
     st.set_page_config(
@@ -92,10 +87,15 @@ if st.button("Generate Key Messages"):
             if st.button(response, key=f"option_{i}"):
                 st.session_state["SELECTED_RESPONSE"] = response
                 st.success(f"Selected: {response}")
+<<<<<<< HEAD
                 st.write("DEBUG: Response selected:", response)
     else:
         st.error("DEBUG: No responses returned for the key messages.")
 
+=======
+    else:
+        st.error("Something went wrong and GPT sent back an empty response.")
+>>>>>>> 7d7ded2 (New changes)
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
 if "SELECTED_RESPONSE" in st.session_state:
