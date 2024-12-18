@@ -13,7 +13,7 @@ def get_openai_completion(user_prompt, system_prompt):
     
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -31,8 +31,8 @@ st.title("Mon homélie.")
 st.markdown("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
 
 # Input fields for prompts
-system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
-user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
+system_prompt = st.text_area("System Prompt", "Tu es un assistant qui guide les prédicateurs pour rédiger une homélie.")
+user_prompt = st.text_area("User Prompt", "Propose 3 psaumes sur l'Espérance")
 
 if st.button("Generate Homily"):
     # Fetch completion via OpenAI API
