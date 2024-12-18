@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 from pydantic import BaseModel
 import traceback as tb
-
+from typing import List
 # Set up OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 client = openai.OpenAI()
@@ -10,7 +10,7 @@ client = openai.OpenAI()
 def generate_chatgpt_responses(prompt=None, response_format=None):
     """Return the result of asking a simple completion with the system prompt and the passed `prompt`. Can stick to a JSON schema when supplied with a response_format class."""
     try:
-
+        return ["a","b"]
         system_prompts = {
             "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
             "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
@@ -31,7 +31,6 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
             model="gpt-4o-mini",
         )
         st.text(response.model_dump_json())
-        return ["a", "b", "c"]
         return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(tb.format_exc())
@@ -67,7 +66,12 @@ elif method == "Custom Input":
     topic_prompt = st.text_area("Enter your custom topic prompt:")
 
 if st.button("Generate Key Messages"):
-    responses = generate_chatgpt_responses(topic_prompt)
+    class KeyMessagesSchema(BaseModel):
+        """Using this class for JSON structured output as {"key_messages": [msg1, msg2...]}"""
+        key_messages = List[str]
+
+    responses = generate_chatgpt_responses(topic_prompt, KeyMessagesSchema)["key_messages"]
+
     if responses:
         st.session_state["RESPONSES"] = responses
         st.write("### Choose a Key Message:")
@@ -77,6 +81,7 @@ if st.button("Generate Key Messages"):
                 st.success(f"Selected: {response}")
     else:
         st.error("Something went wrong and GPT sent back an empty response.")
+
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
 if "SELECTED_RESPONSE" in st.session_state:
