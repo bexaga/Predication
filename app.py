@@ -2,7 +2,6 @@ import streamlit as st
 import openai
 import json
 
-    
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
     import os
@@ -11,7 +10,7 @@ def get_openai_completion(user_prompt, system_prompt):
         return "Error: OPENAI_API_KEY is not set in the environment variables."
 
     openai.api_key = api_key
-    
+
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -31,14 +30,12 @@ def get_openai_completion(user_prompt, system_prompt):
 st.title("Homily Assistant")
 
 # Input fields for prompts
-# Modify the system prompt for forcing JSON output
 system_prompt = st.text_area(
     "System Prompt", 
-    "tu assistes les predicateurs pour annoncer la parole de Dieu. "
+    "tu assistes les prédicateurs pour annoncer la parole de Dieu. "
     "Toujours répondre dans ce format JSON strict : {\"options\": [\"Option 1 content\", \"Option 2 content\", \"Option 3 content\"]}."
 )
-#system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
-user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
+user_prompt = st.text_area("User Prompt", "rédige une homélie pour ce jour")
 
 if st.button("Generate Homily"):
     # Fetch completion via OpenAI API
@@ -58,12 +55,11 @@ if st.button("Generate Homily"):
 
                 # Ensure the response contains options
                 if "options" in response_content and isinstance(response_content["options"], list):
-                    selected_option = st.radio("Select an option to display:", options=[f"Option {i+1}" for i in range(len(response_content["options"]))])
+                    # Use the actual text of each option as the radio button label
+                    selected_option = st.radio("Select an option to display:", options=response_content["options"])
 
-                    # Display each option based on user selection
-                    for i, option in enumerate(response_content["options"]):
-                        if selected_option == f"Option {i+1}":
-                            st.text_area(f"Homily Option {i+1}", value=option, height=200)
+                    # Display the selected option
+                    st.text_area("Selected Homily Option", value=selected_option, height=200)
                 else:
                     st.error("The response does not contain the expected 'options' structure.")
 
