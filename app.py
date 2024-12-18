@@ -53,7 +53,7 @@ system_prompt = st.text_area(
     Si le contenu demandé dépasse tes capacités, réponds quand même dans ce format avec des suggestions générales."""
 )
 
-user_prompt = st.text_area("User Prompt", "Propose 3 psaumes sur l'Espérance")
+user_prompt = st.text_area("User Prompt", "Analyse les textes du jour sur aelf.org: première et seconde lecture, évangile, psaume et propose 3 thèmes pour une homélie")
 
 if st.button("Proposer un thème"):
     # Fetch completion via OpenAI API
