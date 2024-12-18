@@ -1,10 +1,12 @@
 from pydantic import BaseModel
 import streamlit as st
 import openai
+from openai import beta
 import json
 import os
 import traceback as tb
 
+OPENAI_MODEL="gpt-4o-mini"
 ### Streamlit config ###
 st.set_page_config(
     page_title="Predication Generator",
@@ -31,28 +33,41 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
         "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
         "Spanish": "Eres un asistente que ayuda a los predicadores a encontrar inspiración. Por favor, responde SIEMPRE en ESPAÑOL."
     }
+    system_prompt = system_prompts[st.session_state["LANGUAGE"]]
+
+    messages=[
+        {
+            "role" : "system",
+            "content" : system_prompt
+        },
+        {
+            "role": "user",
+            "content": prompt,
+        }
+    ]
+
     try:
-        system_prompt = system_prompts[st.session_state["LANGUAGE"]]
-        response = client.chat.completions.create(
-            messages=[
-                {
-                    "role" : "system",
-                    "content" : system_prompt
-                },
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            model="gpt-4o-mini",
-            response_format=response_format
-        )
-        st.text(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)}")
-        
         if response_format is None:
-            return response.choices[0].message.content.strip()
-        else:
-            return json.loads(response.choices[0].message.to_json())
+            response = client.chat.completions.create(
+                messages=messages,
+                model=OPENAI_MODEL
+            )
+        else: 
+            response = client.beta.chat.completions.parse(
+                messages=messages,
+                model=OPENAI_MODEL,
+                response_format=response_format
+            )
+        st.text(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)}")
+        completion = response.choices[0].message.content.strip()
+        
+        # Try convertin to JSON if GPT returned a JSON-like object
+        try: 
+            completion = json.loads(completion)
+        except: 
+            pass
+
+        return completion
     except Exception as e:
         st.error(tb.format_exc())
 
