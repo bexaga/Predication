@@ -2,6 +2,9 @@ import streamlit as st
 import openai
 import json
 
+class Theme (BaseModel):
+  name: str
+    
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
     import os
@@ -30,7 +33,13 @@ def get_openai_completion(user_prompt, system_prompt):
 st.title("Homily Assistant")
 
 # Input fields for prompts
-system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
+# Modify the system prompt for forcing JSON output
+system_prompt = st.text_area(
+    "System Prompt", 
+    "tu assistes les predicateurs pour annoncer la parole de Dieu. "
+    "Toujours répondre dans ce format JSON strict : {\"options\": [\"Option 1 content\", \"Option 2 content\", \"Option 3 content\"]}."
+)
+#system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
 user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
 
 if st.button("Generate Homily"):
