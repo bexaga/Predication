@@ -27,26 +27,14 @@ def get_openai_completion(user_prompt, system_prompt):
         return f"Error: {e}"
 
 # Streamlit UI
-st.title("Mon homélie.")
+st.title("Mon homélie")
 st.markdown("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
 
 # Input fields for prompts
 system_prompt = st.text_area(
     "System Prompt", 
-    """Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu. 
-    Lorsque l'utilisateur te pose une question, réponds dans un format JSON strict.
-    Assure-toi que la réponse JSON soit formatée exactement ainsi : 
-    {
-        "options": [
-            "Option 1 content",
-            "Option 2 content",
-            "Option 3 content"
-        ]
-    }.
-    Si le contenu demandé dépasse tes capacités, réponds quand même dans ce format avec des suggestions générales."""
+    "Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu. Toujours répondre dans ce format JSON strict : {\"options\": [\"Option 1 content\", \"Option 2 content\", \"Option 3 content\"]}."
 )
-
-#system_prompt = st.text_area("System Prompt", "Tu es un assistant qui guide les prédicateurs pour rédiger une homélie.")
 user_prompt = st.text_area("User Prompt", "Propose 3 psaumes sur l'Espérance")
 
 if st.button("Generate Homily"):
@@ -58,26 +46,27 @@ if st.button("Generate Homily"):
             st.error(response)
         else:
             try:
-                # Print raw response for debugging
-                st.write("### Raw Response:")
-                st.json(response)
-
                 # Parse the response to JSON
                 response_content = json.loads(response["choices"][0]["message"]["content"])
 
                 # Ensure the response contains options
                 if "options" in response_content and isinstance(response_content["options"], list):
+                    st.markdown("### Sélectionnez un ou plusieurs thèmes ci-dessous :")
+
+                    # Generate the selectable options
                     selected_options = st.multiselect(
-                        "Select options to display:",
-                        options=[f"Option {i+1}" for i in range(len(response_content["options"]))]
+                        "Options disponibles :",
+                        options=[f"( ) Thème {i+1}: {response_content['options'][i]}" for i in range(len(response_content["options"]))]
                     )
 
-                    # Display each selected option
-                    for selected_option in selected_options:
-                        index = int(selected_option.split()[-1]) - 1
-                        st.text_area(f"Thème {index + 1}", value=response_content["options"][index], height=200)
+                    # Display selected options
+                    if selected_options:
+                        for option in selected_options:
+                            st.markdown(f"**{option}**")
+                    else:
+                        st.info("Aucune option sélectionnée.")
                 else:
-                    st.error("The response does not contain the expected 'options' structure.")
+                    st.error("La réponse ne contient pas la structure attendue 'options'.")
 
             except json.JSONDecodeError:
-                st.error("Failed to parse the response as JSON. Ensure the AI returns a valid JSON structure.")
+                st.error("Échec de l'analyse de la réponse en JSON. Assurez-vous que l'IA renvoie une structure JSON valide.")
