@@ -7,6 +7,11 @@ from typing import List
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 client = openai.OpenAI()
 
+# Schemas for GPT JSON structure output
+class KeyMessagesSchema(BaseModel):
+    """Use this class for JSON structured output as {"key_messages": [msg1, msg2...]}"""
+    key_messages: list[str]
+
 # Initialize session state variables
 if "RESPONSES" not in st.session_state:
     st.session_state["RESPONSES"] = []
@@ -69,17 +74,15 @@ topic_prompt = ""
 if method == "No Input":
     topic_prompt = "Identifier l'évangile du jour, les lectures de l'ancien testament et du nouveau testament, du psaume. Proposer 5 messages clés qui pourraient être le message central de l'homélie du jour."
 elif method == "Select a Theme":
-    theme = st.selectbox("Select Theme", ["Mariage", "Enterrement", "Première Communion", "Confirmation", "Pâques", "Toussaint", "Noël", "Others"])
+    theme = st.selectbox("Select Theme", ["Mariage", "Enterrement", "Première Communion", "Confirmation", "Pâques", "Toussaint", "Noël", "Others"], key="THEME")
     if theme == "Others":
-        theme = st.text_input("Enter custom theme:")
+        theme = st.text_input("Enter custom theme:", key="THEME")
     topic_prompt = f"Proposer 5 messages clés qui pourraient être le message central d'une homélie sur le thème {theme}."
 elif method == "Custom Input":
     topic_prompt = st.text_area("Enter your custom topic prompt:")
 
 if st.button("Generate Key Messages"):
-    class KeyMessagesSchema(BaseModel):
-        """Using this class for JSON structured output as {"key_messages": [msg1, msg2...]}"""
-        key_messages: list[str]
+    
 
     # Call GPT function
     responses = generate_chatgpt_responses(topic_prompt, KeyMessagesSchema)["key_messages"]
@@ -117,7 +120,7 @@ if st.session_state["SELECTED_RESPONSE"]:
         prompt = prompt_template.format(
             theme=theme,
             topic=st.session_state["SELECTED_RESPONSE"],
-            language=language,
+            language=st.session_state["LANGUAGE"],
         )
         if st.button(f"Generate {source}", key=f"generate_{source}"):
             # Generate responses for the source
@@ -133,7 +136,7 @@ profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "P
 
 if st.button("Generate Predication"):
     predication_prompt = (
-        f"Rédige une homélie de 8 minutes pour {profile} en {language} qui communique sur {st.session_state.get('TOPIC', '')} " ## TODO: add sources
+        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} and including the following phrase as inspiration source {}" ## TODO: add inspiration sources
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
     predication = generate_chatgpt_responses(predication_prompt)
