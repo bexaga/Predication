@@ -76,11 +76,12 @@ if st.button("Proposer un thème"):
                             index = int(option.split()[1]) - 1
                             st.markdown(f"### THEME {index + 1} de l'homélie")
                             st.write(response_content["options"][index])
-                            st.write(f"Thème: {response_content['options'][index]}")
                     else:
                         st.info("Aucune option sélectionnée.")
                 else:
                     st.error("La réponse ne contient pas la structure attendue 'options'.")
+            st.write(f"Thème: {response_content['options'][index]}")
+ 
 
             except json.JSONDecodeError:
                 st.error("Échec de l'analyse de la réponse en JSON. Assurez-vous que l'IA renvoie une structure JSON valide.")
