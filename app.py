@@ -32,7 +32,7 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
             ],
             model="gpt-4o-mini",
         )
-        st.text_input(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)"})
+        st.text_input(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)}")
         return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(tb.format_exc())
