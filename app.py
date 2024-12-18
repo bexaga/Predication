@@ -53,42 +53,32 @@ with st.sidebar:
     language = st.selectbox("Select Language", ["French", "English", "Spanish"], key="LANGUAGE")
     st.markdown("**About Us**: bexaga Lab à Genève\n**Contact Us**: gaillardbx@gmail.com")
 
-# Step 1: Identify Key Message
+# Step 1: Generate Key Messages
 st.header("Step 1: Identify Key Message")
-method = st.radio("Choose a method to identify the key message:", ["No Input", "Select a Theme", "Custom Input"], key="METHOD")
-
-theme = ""
-topic_prompt = ""
-if method == "No Input":
-    topic_prompt = "Identifier l'évangile du jour, les lectures de l'ancien testament et du nouveau testament, du psaume. Proposer 5 messages clés qui pourraient être le message central de l'homélie du jour."
-elif method == "Select a Theme":
-    theme = st.selectbox("Select Theme", ["Mariage", "Enterrement", "Première Communion", "Confirmation", "Pâques", "Toussaint", "Noël", "Others"])
-    if theme == "Others":
-        theme = st.text_input("Enter custom theme:")
-    topic_prompt = f"Proposer 5 messages clés qui pourraient être le message central d'une homélie sur le thème {theme}."
-elif method == "Custom Input":
-    topic_prompt = st.text_area("Enter your custom topic prompt:")
-
 if st.button("Generate Key Messages"):
     class KeyMessagesSchema(BaseModel):
         """Using this class for JSON structured output as {"key_messages": [msg1, msg2...]}"""
         key_messages: list[str]
 
+    # Call GPT function
     responses = generate_chatgpt_responses(topic_prompt, KeyMessagesSchema)["key_messages"]
 
+    # Check if GPT returned valid responses
     if responses:
-        st.session_state["RESPONSES"] = responses
+        st.session_state["RESPONSES"] = responses  # Persist responses in session_state
         st.write("### Choose a Key Message:")
         for i, response in enumerate(responses):
             if st.button(response, key=f"option_{i}"):
-                st.session_state["SELECTED_RESPONSE"] = response
+                st.session_state["SELECTED_RESPONSE"] = response  # Persist selection
                 st.success(f"Selected: {response}")
     else:
         st.error("Something went wrong and GPT sent back an empty response.")
 
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
-if st.session_state.get("SELECTED_RESPONSE"):
+if "SELECTED_RESPONSE" in st.session_state:
+    # Display Step 2 only if a key message was selected
+    st.write(f"Key message selected: **{st.session_state['SELECTED_RESPONSE']}**")
     inspiration_sources = {
         "Joke": "Tu es un pasteur évangélique médiatique, propose 3 mots d'esprit ou blagues sur le thème {theme} en {language}.",
         "Semantic Explanation": "Une explication sémantique pour un mot complexe utilisé dans les textes du jour en {language}.",
@@ -100,13 +90,19 @@ if st.session_state.get("SELECTED_RESPONSE"):
 
     source_responses = {}
     for source, prompt_template in inspiration_sources.items():
-        prompt = prompt_template.format(theme=theme, topic=st.session_state["SELECTED_RESPONSE"], language=language)
-        if st.button(f"Generate {source}"):
+        prompt = prompt_template.format(
+            theme=theme,
+            topic=st.session_state["SELECTED_RESPONSE"],
+            language=language,
+        )
+        if st.button(f"Generate {source}", key=f"generate_{source}"):
+            # Generate responses for the source
             response = generate_chatgpt_responses(prompt)
             if response:
                 source_responses[source] = response[0]
                 st.text_area(f"{source} Output", response[0], height=150, disabled=True)
-
+else:
+    st.info("Please select a key message in Step 1 to continue.")
 
 # Step 3: Compose the Predication
 st.header("Step 3: Compose the Predication")
