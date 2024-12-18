@@ -64,22 +64,28 @@ if st.button("Proposer un thème"):
             st.error(response)
         else:
             try:
+                # Debugging: Show raw response content
+                st.markdown("### Debug: Raw JSON Response")
+                st.write(response)
+
                 # Parse the response to JSON
                 response_content = json.loads(response["choices"][0]["message"]["content"])
 
                 # Ensure the response contains options
                 if "options" in response_content and isinstance(response_content["options"], list):
-                    st.markdown("### Sélectionnez un ou plusieurs thèmes ci-dessous :")
+                    # Debugging: Show parsed options
+                    st.markdown("### Debug: Parsed Options")
+                    st.write(response_content["options"])
 
                     # Store options in session state
                     st.session_state["options_text"] = {
-                        f"Thème {i+1}": response_content["options"][i] 
+                        f"Thème {i+1}: {response_content['options'][i]}": response_content["options"][i] 
                         for i in range(len(response_content["options"]))
                     }
 
                     # Generate the selectable options
                     selected_options = st.multiselect(
-                        "Options disponibles :",
+                        "Options disponibles (avec texte) :",
                         options=list(st.session_state["options_text"].keys()),
                         default=st.session_state["selected_options"]
                     )
