@@ -90,7 +90,7 @@ if st.button("Generate Key Messages"):
 
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
-if "SELECTED_RESPONSE" in st.session_state:
+if st.session_state["SELECTED_RESPONSE"]:
     # Display Step 2 only if a key message was selected
     st.write(f"Key message selected: **{st.session_state['SELECTED_RESPONSE']}**")
     inspiration_sources = {
