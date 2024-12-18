@@ -53,8 +53,22 @@ with st.sidebar:
     language = st.selectbox("Select Language", ["French", "English", "Spanish"], key="LANGUAGE")
     st.markdown("**About Us**: bexaga Lab à Genève\n**Contact Us**: gaillardbx@gmail.com")
 
-# Step 1: Generate Key Messages
+# Step 1: Identify Key Message
 st.header("Step 1: Identify Key Message")
+method = st.radio("Choose a method to identify the key message:", ["No Input", "Select a Theme", "Custom Input"], key="METHOD")
+
+theme = ""
+topic_prompt = ""
+if method == "No Input":
+    topic_prompt = "Identifier l'évangile du jour, les lectures de l'ancien testament et du nouveau testament, du psaume. Proposer 5 messages clés qui pourraient être le message central de l'homélie du jour."
+elif method == "Select a Theme":
+    theme = st.selectbox("Select Theme", ["Mariage", "Enterrement", "Première Communion", "Confirmation", "Pâques", "Toussaint", "Noël", "Others"])
+    if theme == "Others":
+        theme = st.text_input("Enter custom theme:")
+    topic_prompt = f"Proposer 5 messages clés qui pourraient être le message central d'une homélie sur le thème {theme}."
+elif method == "Custom Input":
+    topic_prompt = st.text_area("Enter your custom topic prompt:")
+
 if st.button("Generate Key Messages"):
     class KeyMessagesSchema(BaseModel):
         """Using this class for JSON structured output as {"key_messages": [msg1, msg2...]}"""
