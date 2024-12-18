@@ -40,7 +40,12 @@ if st.button("Generate Homily"):
 
         if isinstance(response, str) and response.startswith("Error"):
             st.error(response)
-        else:
+        else: 
+                # Print raw response for debugging
+                st.write("### Raw Response:")
+                st.json(response)
+
+
             try:
                 # Parse the response to JSON
                 response_content = json.loads(response["choices"][0]["message"]["content"])
