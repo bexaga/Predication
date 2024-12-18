@@ -1,6 +1,10 @@
 import streamlit as st
 import openai
-import json
+from pydantic import BaseModel
+
+# Define the THEME class
+class THEME(BaseModel):
+    theme: str
 
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
@@ -10,7 +14,7 @@ def get_openai_completion(user_prompt, system_prompt):
         return "Error: OPENAI_API_KEY is not set in the environment variables."
 
     openai.api_key = api_key
-    
+
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -18,7 +22,8 @@ def get_openai_completion(user_prompt, system_prompt):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            max_tokens=1000  # Limit token usage
+            max_tokens=1000,  # Limit token usage
+            response_format=THEME
         )
 
         return response
@@ -30,8 +35,8 @@ def get_openai_completion(user_prompt, system_prompt):
 st.title("Homily Assistant")
 
 # Input fields for prompts
-system_prompt = st.text_area("System Prompt", "Tu assistes les predicateurs pour annoncer la parole de Dieu. Tu es toujours courtois, ton message est toujours aligné avec les valeurs chrétiennes.")
-user_prompt = st.text_area("User Prompt", "Analyse les lectures de ce jour sur aelf.org. Identifie trois messages clés en lien avec ces lectures qui pourraient etre le thème central de ton homélie.")
+system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
+user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
 
 if st.button("Generate Homily"):
     # Fetch completion via OpenAI API
@@ -40,26 +45,15 @@ if st.button("Generate Homily"):
 
         if isinstance(response, str) and response.startswith("Error"):
             st.error(response)
-        else: 
-            # Print raw response for debugging
-            st.write("### Raw Response:")
-            st.json(response)
-
-
+        else:
             try:
-                # Parse the response to JSON
-                response_content = json.loads(response["choices"][0]["message"]["content"])
+                # Print raw response for debugging
+                st.write("### Raw Response:")
+                st.json(response)
 
-                # Ensure the response contains options
-                if "options" in response_content and isinstance(response_content["options"], list):
-                    selected_option = st.radio("Select an option to display:", options=[f"Option {i+1}" for i in range(len(response_content["options"]))])
+                # Extract and display the theme
+                theme = response["choices"][0]["message"]["parsed"]["theme"]
+                st.text_area("Generated Theme", value=theme, height=100)
 
-                    # Display each option based on user selection
-                    for i, option in enumerate(response_content["options"]):
-                        if selected_option == f"Option {i+1}":
-                            st.text_area(f"Homily Option {i+1}", value=option, height=200)
-                else:
-                    st.error("The response does not contain the expected 'options' structure.")
-
-            except json.JSONDecodeError:
-                st.error("Failed to parse the response as JSON. Ensure the AI returns a valid JSON structure.")
+            except KeyError:
+                st.error("Failed to parse the response. Ensure the AI returns a valid theme structure.")
