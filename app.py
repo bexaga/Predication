@@ -26,7 +26,7 @@ st.title("Homily Assistant")
 # Input fields for prompts and API key
 system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
 user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
-api_key = 'OPENAI_API_KEY'
+api_key = OPENAI_API_KEY
 
 if st.button("Generate Homily"):
     if not api_key:
