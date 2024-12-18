@@ -30,8 +30,8 @@ def get_openai_completion(user_prompt, system_prompt):
 st.title("Homily Assistant")
 
 # Input fields for prompts
-system_prompt = st.text_area("System Prompt", "tu assistes les predicateurs pour annoncer la parole de Dieu")
-user_prompt = st.text_area("User Prompt", "redige une homelie pour ce jour")
+system_prompt = st.text_area("System Prompt", "Tu assistes les predicateurs pour annoncer la parole de Dieu. Tu es toujours courtois, ton message est toujours aligné avec les valeurs chrétiennes.")
+user_prompt = st.text_area("User Prompt", "Analyse les lectures de ce jour sur aelf.org. Identifie trois messages clés en lien avec ces lectures qui pourraient etre le thème central de ton homélie.")
 
 if st.button("Generate Homily"):
     # Fetch completion via OpenAI API
