@@ -1,10 +1,6 @@
 import streamlit as st
 import openai
-from pydantic import BaseModel
-
-# Define the THEME class
-class THEME(BaseModel):
-    theme: str
+import json
 
 # Function to call the OpenAI API
 def get_openai_completion(user_prompt, system_prompt):
@@ -14,7 +10,7 @@ def get_openai_completion(user_prompt, system_prompt):
         return "Error: OPENAI_API_KEY is not set in the environment variables."
 
     openai.api_key = api_key
-
+    
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -22,8 +18,7 @@ def get_openai_completion(user_prompt, system_prompt):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            max_tokens=1000,  # Limit token usage
-            response_format=THEME
+            max_tokens=1000  # Limit token usage
         )
 
         return response
@@ -51,9 +46,19 @@ if st.button("Generate Homily"):
                 st.write("### Raw Response:")
                 st.json(response)
 
-                # Extract and display the theme
-                theme = response["choices"][0]["message"]["parsed"]["theme"]
-                st.text_area("Generated Theme", value=theme, height=100)
+                # Parse the response to JSON
+                response_content = json.loads(response["choices"][0]["message"]["content"])
 
-            except KeyError:
-                st.error("Failed to parse the response. Ensure the AI returns a valid theme structure.")
+                # Ensure the response contains options
+                if "options" in response_content and isinstance(response_content["options"], list):
+                    selected_option = st.radio("Select an option to display:", options=[f"Option {i+1}" for i in range(len(response_content["options"]))])
+
+                    # Display each option based on user selection
+                    for i, option in enumerate(response_content["options"]):
+                        if selected_option == f"Option {i+1}":
+                            st.text_area(f"Homily Option {i+1}", value=option, height=200)
+                else:
+                    st.error("The response does not contain the expected 'options' structure.")
+
+            except json.JSONDecodeError:
+                st.error("Failed to parse the response as JSON. Ensure the AI returns a valid JSON structure.")
