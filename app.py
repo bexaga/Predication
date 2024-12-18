@@ -87,15 +87,8 @@ if st.button("Generate Key Messages"):
             if st.button(response, key=f"option_{i}"):
                 st.session_state["SELECTED_RESPONSE"] = response
                 st.success(f"Selected: {response}")
-<<<<<<< HEAD
-                st.write("DEBUG: Response selected:", response)
-    else:
-        st.error("DEBUG: No responses returned for the key messages.")
-
-=======
     else:
         st.error("Something went wrong and GPT sent back an empty response.")
->>>>>>> 7d7ded2 (New changes)
 # Step 2: Generate Inspirations
 st.header("Step 2: Generate Inspirations")
 if "SELECTED_RESPONSE" in st.session_state:
