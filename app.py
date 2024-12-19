@@ -58,6 +58,7 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
                 model=OPENAI_MODEL,
                 response_format=response_format
             )
+        st.text(f"DEBUG: prompting with prompt: {prompt}")
         st.text(f"DEBUG: JSON RETURNED {response.model_dump_json(indent=4)}")
         completion = response.choices[0].message.content.strip()
         
@@ -94,6 +95,8 @@ if "RESPONSES" not in st.session_state:
     st.session_state["RESPONSES"] = []
 if "SELECTED_RESPONSE" not in st.session_state:
     st.session_state["SELECTED_RESPONSE"] = None
+if "THEME" not in st.session_state:
+    st.session_state["THEME"] = None
 
 ### DEBUG: Initialize session state
 if "selected_options" not in st.session_state:
@@ -225,36 +228,38 @@ if st.session_state["SELECTED_RESPONSE"]:
     # Display Step 2 only if a key message was selected
     st.write(f"Key message selected: **{st.session_state['SELECTED_RESPONSE']}**")
     inspiration_sources = {
-        "Joke": "Tu es un pasteur évangélique médiatique, propose 3 mots d'esprit ou blagues sur le thème {theme} en {language}.",
-        "Semantic Explanation": "Une explication sémantique pour un mot complexe utilisé dans les textes du jour en {language}.",
-        "Dogma Reference": "Une ouverture sur une référence des textes officiels de la doctrine, catéchisme, pères de l'église en {language}.",
-        "Current Event": "Un évènement actuel pertinent pour les chrétiens auquel on pourrait faire référence en lien avec {topic} en {language}.",
-        "Metaphor": "Une métaphore créative pour expliquer {topic} en {language}.",
-        "Everyday Life Situation": "Une situation de la vie quotidienne où ce message clé sera particulièrement pertinent en {language}."
+        "Joke": "Tu es un pasteur évangélique médiatique, propose 3 mots d'esprit ou blagues sur le thème {theme} en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}.",
+        "Semantic Explanation": "Une explication sémantique pour un mot complexe utilisé dans les textes du jour en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}.",
+        "Dogma Reference": "Une ouverture sur une référence des textes officiels de la doctrine, catéchisme, pères de l'église en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}.",
+        "Current Event": "Un évènement actuel pertinent pour les chrétiens auquel on pourrait faire référence en lien avec {topic} en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}.",
+        "Metaphor": "Une métaphore créative pour expliquer {topic} en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}.",
+        "Everyday Life Situation": "Une situation de la vie quotidienne où ce message clé sera particulièrement pertinent en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}."
     }
 
     source_responses = {}
     for source, prompt_template in inspiration_sources.items():
         prompt = prompt_template.format(
-            theme=theme,
+            theme=st.session_state["THEME"],
             topic=st.session_state["SELECTED_RESPONSE"],
             language=st.session_state["LANGUAGE"],
+            key_message=st.session_state["SELECTED_RESPONSE"],
         )
         if st.button(f"Generate {source}", key=f"generate_{source}"):
             # Generate responses for the source
             response = generate_chatgpt_responses(prompt)
             if response:
                 source_responses[source] = response
-                st.text_area(f"{source} Output", response[0], height=150, disabled=True)
+                st.text_area(f"{source} Output", response, height=150, disabled=True)
 else:
     st.info("Please select a key message in Step 1 to continue.")
+    
 # Step 3: Compose the Predication
 st.header("Step 3: Compose the Predication")
 profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "Pasteur protestant", "Pasteur évangélique", "Père ou mère de famille"])
 
 if st.button("Generate Predication"):
     predication_prompt = (
-        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration {st.session_state.get('SOURCE')}" ## TODO: add inspiration sources
+        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:"+ "\n".join([item for item in source_responses.values()]) ## TODO: add inspiration sources
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
     predication = generate_chatgpt_responses(predication_prompt)
