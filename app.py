@@ -238,8 +238,7 @@ if st.session_state["SELECTED_RESPONSE"]:
         "Metaphor": "Une métaphore créative pour expliquer {topic} en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}.",
         "Everyday Life Situation": "Une situation de la vie quotidienne où ce message clé sera particulièrement pertinent en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}."
     }
-
-    st.session_state["INSPIRATIONS"] = {}
+    
     for source, prompt_template in inspiration_sources.items():
         prompt = prompt_template.format(
             theme=st.session_state["THEME"],
