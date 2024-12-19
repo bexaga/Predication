@@ -1,3 +1,5 @@
+from email.message import EmailMessage
+import smtplib
 from pydantic import BaseModel
 import streamlit as st
 import openai
@@ -97,7 +99,8 @@ if "SELECTED_RESPONSE" not in st.session_state:
     st.session_state["SELECTED_RESPONSE"] = None
 if "THEME" not in st.session_state:
     st.session_state["THEME"] = None
-
+if "INSPIRATIONS" not in st.session_state:
+    st.session_state["INSPIRATIONS"] = {}
 ### DEBUG: Initialize session state
 if "selected_options" not in st.session_state:
     st.session_state["selected_options"] = []
@@ -236,7 +239,7 @@ if st.session_state["SELECTED_RESPONSE"]:
         "Everyday Life Situation": "Une situation de la vie quotidienne où ce message clé sera particulièrement pertinent en {language}. Tu devrais prendre en compte le message clé suivant pour la prédication : {key_message}."
     }
 
-    source_responses = {}
+    st.session_state["INSPIRATIONS"] = {}
     for source, prompt_template in inspiration_sources.items():
         prompt = prompt_template.format(
             theme=st.session_state["THEME"],
@@ -248,8 +251,8 @@ if st.session_state["SELECTED_RESPONSE"]:
             # Generate responses for the source
             response = generate_chatgpt_responses(prompt)
             if response:
-                source_responses[source] = response
-                st.text_area(f"{source} Output", response, height=150, disabled=True)
+                st.session_state["INSPIRATIONS"][source] = response
+                st.text_area(f"{source} Output", response, height=150, disabled=True, key=f"INSPIRATION_{source}")
 else:
     st.info("Please select a key message in Step 1 to continue.")
     
@@ -259,7 +262,7 @@ profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "P
 
 if st.button("Generate Predication"):
     predication_prompt = (
-        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:"+ "\n".join([item for item in source_responses.values()]) ## TODO: add inspiration sources
+        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:" + json.dumps(st.session_state["INSPIRATIONS"], indent=4) ## TODO: add inspiration sources
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
     predication = generate_chatgpt_responses(predication_prompt)
@@ -271,7 +274,22 @@ email = st.text_input("Enter your email address:")
 city = st.text_input("City:")
 country = st.text_input("Country:")
 
+def send_mail(to_email, subject, message, server='smtp.gmail.com'):
+    
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = os.environ.get("EMAIL_USER")
+    msg['To'] = ', '.join(to_email)
+    msg.set_content(message)
+    print(msg)
+    server = smtplib.SMTP(server)
+    server.set_debuglevel(1)
+    server.login(os.environ.get("EMAIL_USER"), os.environ.get("EMAIL_PASSWORD"))  # user & password
+    server.send_message(msg)
+    server.quit()
+    print('successfully sent the mail.')
+
 if st.button("Send Email"):
-    pass
+    send_mail(email, "Your predication for the day", predication)
     # TODO Send email.
 ### Streamlit app ###
