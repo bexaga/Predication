@@ -31,10 +31,11 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
     """Return the result of asking a simple completion with the system prompt and the passed 
     `prompt`. Can stick to a JSON schema when supplied with a response_format Pydantic class."""
     system_prompts = {
-        "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH.",
-        "French": "Vous êtes un assistant qui aide les prédicateurs à trouver l'inspiration. Veuillez TOUJOURS répondre en FRANÇAIS.",
-        "Spanish": "Eres un asistente que ayuda a los predicadores a encontrar inspiración. Por favor, responde SIEMPRE en ESPAÑOL."
+        "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH. Only produce the requested text and avoid openers like 'Certainly! Here’s what you asked {sermon}'. Instead, just output {sermon}",
+        "French": "Vous aidez les prédicateurs à trouver l'inspiration. Répondez TOUJOURS en FRANÇAIS. Donnez uniquement le texte demandé et évitez les introductions comme 'Voici ce que vous avez demandé {sermon}'. Juste le texte {sermon}.",
+        "Spanish": "Ayudas a los predicadores a encontrar inspiración. Responde SIEMPRE en ESPAÑOL. Solo da el texto solicitado y evita introducciones como 'Aquí tienes lo que pediste {sermón}'. Solo el texto {sermón}."
     }
+
     system_prompt = system_prompts[st.session_state["LANGUAGE"]]
 
     messages=[
@@ -112,77 +113,77 @@ if "options_text" not in st.session_state:
 st.title("Mon homélie")
 st.markdown("Cet assistant vous guide pour identifier un thème, trouver des références et rédiger une homélie personnalisée.")
 
-# Input fields for prompts
-system_prompt = st.text_area(
-    "System Prompt", 
-    """Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu. 
-    Lorsque l'utilisateur te pose une question, réponds dans un format JSON strict.
-    Assure-toi que la réponse JSON soit formatée exactement ainsi : 
-    {
-        "options": [
-            "Option 1 content",
-            "Option 2 content",
-            "Option 3 content"
-        ]
-    }.
-    Si le contenu demandé dépasse tes capacités, réponds quand même dans ce format avec des suggestions générales."""
-)
+# # Input fields for prompts
+# system_prompt = st.text_area(
+#     "System Prompt", 
+#     """Tu es un assistant qui guide les prédicateurs pour annoncer la Parole de Dieu. 
+#     Lorsque l'utilisateur te pose une question, réponds dans un format JSON strict.
+#     Assure-toi que la réponse JSON soit formatée exactement ainsi : 
+#     {
+#         "options": [
+#             "Option 1 content",
+#             "Option 2 content",
+#             "Option 3 content"
+#         ]
+#     }.
+#     Si le contenu demandé dépasse tes capacités, réponds quand même dans ce format avec des suggestions générales."""
+# )
 
-user_prompt = st.text_area("User Prompt", "Analyse les textes du jour sur aelf.org: première et seconde lecture, évangile, psaume et propose 3 thèmes pour une homélie")
+# user_prompt = st.text_area("User Prompt", "Analyse les textes du jour sur aelf.org: première et seconde lecture, évangile, psaume et propose 3 thèmes pour une homélie")
 
-if st.button("Proposer un thème"):
-    # Fetch completion via OpenAI API
-    with st.spinner("Je prépare 3 options de thèmes."):
-        response = generate_chatgpt_responses(user_prompt, KeyMessagesSchema)
+# if st.button("Proposer un thème"):
+#     # Fetch completion via OpenAI API
+#     with st.spinner("Je prépare 3 options de thèmes."):
+#         response = generate_chatgpt_responses(user_prompt, KeyMessagesSchema)
 
-        if isinstance(response, str) and response.startswith("Error"):
-            st.error(response)
-        else:
-            try:
-                # Debugging: Show raw response content
-                st.markdown("### Debug: Raw JSON Response")
-                st.write(response)
+#         if isinstance(response, str) and response.startswith("Error"):
+#             st.error(response)
+#         else:
+#             try:
+#                 # Debugging: Show raw response content
+#                 st.markdown("### Debug: Raw JSON Response")
+#                 st.write(response)
 
-                # Parse the response to JSON
-                response_content = json.loads(response.choices[0].message.content)
+#                 # Parse the response to JSON
+#                 response_content = json.loads(response.choices[0].message.content)
 
-                # Ensure the response contains options
-                if "options" in response_content and isinstance(response_content["options"], list):
-                    # Debugging: Show parsed options
-                    st.markdown("### Debug: Parsed Options")
-                    st.write(response_content["options"])
+#                 # Ensure the response contains options
+#                 if "options" in response_content and isinstance(response_content["options"], list):
+#                     # Debugging: Show parsed options
+#                     st.markdown("### Debug: Parsed Options")
+#                     st.write(response_content["options"])
 
-                    # Store options in session state
-                    st.session_state["options_text"] = {
-                        f"Thème {i+1}": response_content["options"][i] 
-                        for i in range(len(response_content["options"]))
-                    }
+#                     # Store options in session state
+#                     st.session_state["options_text"] = {
+#                         f"Thème {i+1}": response_content["options"][i] 
+#                         for i in range(len(response_content["options"]))
+#                     }
 
-                    # Generate the selectable options
-                    selected_options = st.multiselect(
-                        "Options disponibles (avec texte) :",
-                        options=list(st.session_state["options_text"].keys()),
-                        default=st.session_state["selected_options"]
-                    )
+#                     # Generate the selectable options
+#                     selected_options = st.multiselect(
+#                         "Options disponibles (avec texte) :",
+#                         options=list(st.session_state["options_text"].keys()),
+#                         default=st.session_state["selected_options"]
+#                     )
 
-                    # Update session state with selected options
-                    st.session_state["selected_options"] = selected_options
-                else:
-                    st.error("La réponse ne contient pas la structure attendue 'options'.")
+#                     # Update session state with selected options
+#                     st.session_state["selected_options"] = selected_options
+#                 else:
+#                     st.error("La réponse ne contient pas la structure attendue 'options'.")
 
-            except json.JSONDecodeError:
-                st.error("Échec de l'analyse de la réponse en JSON. Assurez-vous que l'IA renvoie une structure JSON valide.")
+#             except json.JSONDecodeError:
+#                 st.error("Échec de l'analyse de la réponse en JSON. Assurez-vous que l'IA renvoie une structure JSON valide.")
 
-# Display the text for the selected options
-if st.session_state["selected_options"]:
-    st.markdown("### Vos sélections :")
-    for option in st.session_state["selected_options"]:
-        if option in st.session_state["options_text"]:
-            st.markdown(f"#### {option}")
-            st.write(f"Thème: {st.session_state['options_text'][option]}")
-        else:
-            st.markdown(f"#### {option}")
-            st.write("Texte non disponible")
+# # Display the text for the selected options
+# if st.session_state["selected_options"]:
+#     st.markdown("### Vos sélections :")
+#     for option in st.session_state["selected_options"]:
+#         if option in st.session_state["options_text"]:
+#             st.markdown(f"#### {option}")
+#             st.write(f"Thème: {st.session_state['options_text'][option]}")
+#         else:
+#             st.markdown(f"#### {option}")
+#             st.write("Texte non disponible")
 
 ### Streamlit app setup
 # Hamburger menu
@@ -249,9 +250,16 @@ if st.session_state["SELECTED_RESPONSE"]:
         if st.button(f"Generate {source}", key=f"generate_{source}"):
             # Generate responses for the source
             response = generate_chatgpt_responses(prompt)
+
+            def toggle_inspiration(source):
+                if source in st.session_state["INSPIRATIONS"]:
+                    st.session_state["INSPIRATIONS"].pop(source)
+                else:
+                    st.session_state["INSPIRATIONS"][source] = response
+
             if response:
                 st.session_state["INSPIRATIONS"][source] = response
-                st.text_area(f"{source} Output", response, height=150, disabled=True, key=f"INSPIRATION_{source}")
+                st.selectbox(f"Include generated {source}: {response}", key=f"INSPIRATION_{source}", on_change=toggle_inspiration)
 else:
     st.info("Please select a key message in Step 1 to continue.")
     
@@ -261,7 +269,7 @@ profile = st.selectbox("Who are we writing this for?", ["Prêtre catholique", "P
 
 if st.button("Generate Predication"):
     predication_prompt = (
-        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:" + json.dumps(st.session_state["INSPIRATIONS"], indent=4) ## TODO: add inspiration sources
+        f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:" + json.dumps(st.session_state["INSPIRATIONS"], indent=4)
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
     predication = generate_chatgpt_responses(predication_prompt)
