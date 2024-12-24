@@ -251,7 +251,7 @@ if st.session_state["SELECTED_RESPONSE"]:
             # Generate responses for the source
             response = generate_chatgpt_responses(prompt)
 
-            def toggle_inspiration(source):
+            def toggle_inspiration():
                 if source in st.session_state["INSPIRATIONS"]:
                     st.session_state["INSPIRATIONS"].pop(source)
                 else:
