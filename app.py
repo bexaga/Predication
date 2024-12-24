@@ -259,8 +259,8 @@ if st.session_state["SELECTED_RESPONSE"]:
 
             if response:
                 st.session_state["INSPIRATIONS"][source] = response
-                
-        if st.session_state["INSPIRATIONS"][source]:
+
+        if source in st.session_state["INSPIRATIONS"]:
             st.checkbox(f"Include generated {source}: {response}", key=f"INSPIRATION_{source}")
 else:
     st.info("Please select a key message in Step 1 to continue.")
