@@ -197,8 +197,8 @@ if st.button("Generate Predication"):
         f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:" + json.dumps(st.session_state["INSPIRATIONS"], indent=4)
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
-    predication = generate_chatgpt_responses(predication_prompt)
-    st.markdown(predication, unsafe_allow_html=True)
+    st.session_state["PREDICATION"] = generate_chatgpt_responses(predication_prompt)
+    st.markdown(st.session_state["PREDICATION"], unsafe_allow_html=True)
 
 # Step 4: Share
 st.header("Step 4: Share")
@@ -222,6 +222,6 @@ def send_mail(to_email, subject, message, server='smtp.gmail.com'):
     print('successfully sent the mail.')
 
 if st.button("Send Email"):
-    send_mail(email, "Your predication for the day", predication)
+    send_mail(email, "Your predication for the day", st.session_state["PREDICATION"])
     # TODO Send email.
 ### Streamlit app ###
