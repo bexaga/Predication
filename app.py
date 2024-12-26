@@ -222,6 +222,8 @@ def send_mail(to_email, subject, message, server='smtp.gmail.com'):
     print('successfully sent the mail.')
 
 if st.button("Send Email"):
+    if "PREDICATION" not in st.session_state:
+        st.error("Please generate the predication first")
     send_mail(email, "Your predication for the day", st.session_state["PREDICATION"])
     # TODO Send email.
 ### Streamlit app ###
