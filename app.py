@@ -197,8 +197,7 @@ if st.button("Generate Predication"):
         f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:" + json.dumps(st.session_state["INSPIRATIONS"], indent=4)
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
-    st.session_state["PREDICATION"] = generate_chatgpt_responses(predication_prompt)
-    st.markdown(st.session_state["PREDICATION"], unsafe_allow_html=True)
+    st.text_area(generate_chatgpt_responses(predication_prompt), key="PREDICATION", unsafe_allow_html=True)
 
 # Step 4: Share
 st.header("Step 4: Share")
@@ -206,7 +205,7 @@ email = st.text_input("Enter your email address:")
 city = st.text_input("City:")
 country = st.text_input("Country:")
 
-def send_mail(to_email, subject, message, server='smtp.gmail.com'):
+def send_mail(to_email, subject, message, server='smtp.gmail.com', port=587):
     
     msg = EmailMessage()
     msg['Subject'] = subject
@@ -214,12 +213,13 @@ def send_mail(to_email, subject, message, server='smtp.gmail.com'):
     msg['To'] = ', '.join(to_email)
     msg.set_content(message)
     print(msg)
-    server = smtplib.SMTP(server)
+    server = smtplib.SMTP(server, port)
     server.set_debuglevel(1)
+    server.starttls()
     server.login(os.environ.get("EMAIL_USER"), os.environ.get("EMAIL_PASSWORD"))  # user & password
     server.send_message(msg)
     server.quit()
-    print('successfully sent the mail.')
+    st.text_area('Your predication has been successfully e-mailed.')
 
 if st.button("Send Email"):
     if "PREDICATION" not in st.session_state:
