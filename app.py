@@ -33,10 +33,11 @@ def generate_chatgpt_responses(prompt=None, response_format=None):
     """Return the result of asking a simple completion with the system prompt and the passed 
     `prompt`. Can stick to a JSON schema when supplied with a response_format Pydantic class."""
     system_prompts = {
-        "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH. Only produce the requested text and avoid openers like 'Certainly! Here’s what you asked {sermon}'. Instead, just output {sermon}",
-        "French": "Vous aidez les prédicateurs à trouver l'inspiration. Répondez TOUJOURS en FRANÇAIS. Donnez uniquement le texte demandé et évitez les introductions comme 'Voici ce que vous avez demandé {sermon}'. Juste le texte {sermon}.",
-        "Spanish": "Ayudas a los predicadores a encontrar inspiración. Responde SIEMPRE en ESPAÑOL. Solo da el texto solicitado y evita introducciones como 'Aquí tienes lo que pediste {sermón}'. Solo el texto {sermón}."
-    }
+    "English": "You are an assistant that helps preachers find inspiration. Please ALWAYS reply in ENGLISH. Only produce the requested text and avoid openers like 'Certainly! Here’s what you asked {sermon}'. Instead, just output what the sermon is.",
+    "French": "Vous aidez les prédicateurs à trouver l'inspiration. Répondez TOUJOURS en FRANÇAIS. Donnez uniquement le sermon demandé et évitez les introductions comme 'Voici ce que vous avez demandé {sermon}'. Juste le sermon demandé.",
+    "Spanish": "Ayudas a los predicadores a encontrar inspiración. Responde SIEMPRE en ESPAÑOL. Solo da el texto solicitado y evita introducciones como 'Aquí tienes lo que pediste {sermón}'. Solo el sermón pedido."
+}
+
 
     system_prompt = system_prompts[st.session_state["LANGUAGE"]]
 
