@@ -197,7 +197,7 @@ if st.button("Generate Predication"):
         f"Rédige une homélie de 8 minutes pour {profile} en {st.session_state['LANGUAGE']} qui communique sur {st.session_state.get('THEME', '')} et qui inclut comme inspiration:" + json.dumps(st.session_state["INSPIRATIONS"], indent=4)
     )
     # f"en utilisant ces sources: {', '.join(source_variables.values())}."
-    st.text_area(generate_chatgpt_responses(predication_prompt), key="PREDICATION", unsafe_allow_html=True)
+    st.text_area(generate_chatgpt_responses(predication_prompt), key="PREDICATION")
 
 # Step 4: Share
 st.header("Step 4: Share")
